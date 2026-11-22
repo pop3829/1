@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اختبارات زبدة القدرات</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#17233d;--mut:#66728c;--line:#dfe5f0;--brand:#2563a8;--soft:#e8f0fb;--ok:#168a52;--okb:#e3f5ec;--bad:#c93a3a;--badb:#fdeaea;--warn:#b97800;--warnb:#fff3d1}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1626;--card:#17213a;--ink:#e9eef8;--mut:#9ca9c5;--line:#28365c;--brand:#6aa5ea;--soft:#1d2b4b;--okb:#113a2b;--badb:#431c22;--warnb:#3b2f10}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif;line-height:1.6}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+.btn{border:0;border-radius:14px;padding:14px 24px;font-weight:700;font-size:1.05rem;background:var(--brand);color:#fff}
+.btn.sec{background:var(--soft);color:var(--brand)}
+.btn:disabled{opacity:.4}
+.btn.full{width:100%}
+h1{margin:0}
+.head{text-align:center;padding:28px 0 10px}
+.head p{color:var(--mut);margin:4px 0 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:18px}
+.t{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px 8px;text-align:center}
+.t:active{transform:scale(.97)}
+.t b{display:block;font-size:2rem;color:var(--brand);line-height:1.2}
+.t small{display:block;color:var(--mut);font-size:.8rem;min-height:1.3em}
+.t.done{border-color:var(--ok)}.t.done small{color:var(--ok);font-weight:700}
+.t.run{border-color:var(--warn)}.t.run small{color:var(--warn);font-weight:700}
+.bar{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+.bar .in{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 16px}
+.sp{flex:1}
+.tm{font-weight:800;font-size:1.3rem;font-variant-numeric:tabular-nums;direction:ltr;background:var(--soft);color:var(--brand);padding:4px 14px;border-radius:12px}
+.tm.w{background:var(--warnb);color:var(--warn)}.tm.c{background:var(--badb);color:var(--bad)}
+.link{background:none;border:0;color:var(--brand);font-weight:700;padding:6px}
+.qimg{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:12px}
+.qimg img{display:block;width:100%;height:auto}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.o{padding:16px 0;font-size:1.5rem;font-weight:800;border:2px solid var(--line);border-radius:16px;background:var(--card)}
+.o.sel{background:var(--brand);border-color:var(--brand);color:#fff}
+.o.r{background:var(--okb);border-color:var(--ok);color:var(--ok)}
+.o.w{background:var(--badb);border-color:var(--bad);color:var(--bad)}
+.nav{display:flex;gap:10px}.nav .btn{flex:1}
+.msg{padding:10px 14px;border-radius:12px;font-weight:700;margin-top:12px}
+.msg.ok{background:var(--okb);color:var(--ok)}.msg.bad{background:var(--badb);color:var(--bad)}.msg.skip{background:var(--warnb);color:var(--warn)}
+.ov{position:fixed;inset:0;background:rgba(8,13,26,.6);display:grid;place-items:center;padding:14px;z-index:20}
+.dlg{background:var(--card);border-radius:20px;padding:22px;width:min(480px,100%);max-height:90vh;overflow:auto;text-align:center}
+.dlg h2{margin:0 0 6px}.dlg p{color:var(--mut);margin:4px 0}
+.pg{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin:14px 0}
+.c{aspect-ratio:1;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-weight:700}
+.c.a{background:var(--soft);border-color:var(--brand);color:var(--brand)}
+.c.cur{outline:3px solid var(--brand)}
+.c.ok{background:var(--okb);border-color:var(--ok);color:var(--ok)}.c.no{background:var(--badb);border-color:var(--bad);color:var(--bad)}.c.sk{background:var(--warnb);border-color:var(--warn);color:var(--warn)}
+.score{font-size:4rem;font-weight:900;color:var(--brand);line-height:1.1;margin-top:10px}
+.row{display:flex;gap:10px;margin-top:16px}.row .btn{flex:1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.stats div{border-radius:14px;padding:12px 4px;font-weight:700}
+.stats b{display:block;font-size:1.6rem}
+@media(max-width:480px){.o{font-size:1.3rem;padding:13px 0}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="ov" class="ov" style="display:none"><div class="dlg" id="dlg"></div></div>
+<script src="data.js"></script>
+<script>
+const L=["أ","ب","ج","د"], DUR=55*60, $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const img=(t,i)=>"img/t"+pad(t)+"/q"+pad(i+1)+".jpg";
+const fmt=s=>{s=Math.max(0,Math.floor(s));return pad(Math.floor(s/60))+":"+pad(s%60)};
+const key=t=>"zb_"+t;
+const ld=t=>{try{return JSON.parse(localStorage.getItem(key(t)))}catch(e){return null}};
+const sv=()=>{try{localStorage.setItem(key(T),JSON.stringify(S))}catch(e){}};
+let T=0,S=null,mode="exam",tick=null;
+
+function home(){
+  clearInterval(tick); mode="exam";
+  let h='<div class="wrap"><div class="head"><h1>اختبارات زبدة القدرات</h1><p>اختر رقم الاختبار — لكل اختبار 55 دقيقة</p></div><div class="grid">';
+  for(let t=1;t<=43;t++){
+    const p=ld(t); let c="t",s="لم يبدأ";
+    if(p&&p.done){c+=" done";s="النتيجة "+p.score+"/"+DATA[t].length}
+    else if(p&&Date.now()-p.start<DUR*1000){c+=" run";s="جارٍ…"}
+    h+='<button class="'+c+'" onclick="open_('+t+')"><b>'+t+'</b><small>'+s+'</small></button>';
+  }
+  $("app").innerHTML=h+'</div></div>'; window.scrollTo(0,0);
+}
+function open_(t){
+  T=t; const p=ld(t), n=DATA[t].length;
+  if(p&&p.done){S=p;return result()}
+  if(p&&Date.now()-p.start<DUR*1000){S=p;return exam()}
+  if(p){S=p;return finish()}
+  dlg('<h2>اختبار '+t+'</h2><p>'+n+' سؤالاً · 55 دقيقة</p><p>يبدأ الوقت عند الضغط على «ابدأ».</p><div class="row"><button class="btn sec" onclick="closeDlg()">رجوع</button><button class="btn" onclick="begin()">ابدأ</button></div>');
+}
+function begin(){closeDlg();S={start:Date.now(),a:Array(DATA[T].length).fill(-1),cur:0,done:false};sv();exam()}
+function dlg(h){$("dlg").innerHTML=h;$("ov").style.display="grid"}
+function closeDlg(){$("ov").style.display="none"}
+
+function exam(){
+  mode="exam"; clearInterval(tick); draw(); tick=setInterval(tm,500);
+}
+function tm(){
+  const r=DUR-(Date.now()-S.start)/1000, e=$("tm"); if(!e)return;
+  e.textContent=fmt(r); e.className="tm"+(r<=300?" c":r<=600?" w":"");
+  if(r<=0)finish();
+}
+function draw(){
+  const A=DATA[T], i=S.cur, n=A.length, rv=mode==="review";
+  let h='<div class="bar"><div class="in"><button class="link" onclick="'+(rv?'result()':'leave()')+'">'+(rv?'النتيجة':'الرئيسية')+'</button><span class="sp"></span>'+
+    (rv?'':'<span class="tm" id="tm">'+fmt(DUR-(Date.now()-S.start)/1000)+'</span>')+
+    '<span class="sp"></span><button class="link" onclick="pal()">الأسئلة</button></div></div><div class="wrap">'+
+    '<div style="font-weight:800">السؤال '+(i+1)+' <span style="color:var(--mut);font-weight:600">من '+n+'</span></div>'+
+    '<div class="qimg" onclick="zoom()"><img src="'+img(T,i)+'" alt="السؤال"></div>';
+  if(rv){
+    const a=S.a[i];
+    h+=a===-1?'<div class="msg skip">لم تُجب — الصحيحة: '+L[A[i]]+'</div>':a===A[i]?'<div class="msg ok">إجابة صحيحة ✓</div>':'<div class="msg bad">إجابتك '+L[a]+' — الصحيحة: '+L[A[i]]+'</div>';
+  }
+  h+='<div class="opts">';
+  for(let k=0;k<4;k++){
+    let c="o";
+    if(rv){if(k===A[i])c+=" r";else if(k===S.a[i])c+=" w"}else if(S.a[i]===k)c+=" sel";
+    h+='<button class="'+c+'" '+(rv?'disabled':'onclick="pick('+k+')"')+'>'+L[k]+'</button>';
+  }
+  h+='</div><div class="nav"><button class="btn sec" onclick="go('+(i-1)+')" '+(i===0?'disabled':'')+'>السابق</button>'+
+    (i===n-1&&!rv?'<button class="btn" onclick="ask()">تسليم</button>':'<button class="btn" onclick="go('+(i+1)+')" '+(i===n-1?'disabled':'')+'>التالي</button>')+'</div></div>';
+  $("app").innerHTML=h; window.scrollTo(0,0);
+}
+function pick(k){S.a[S.cur]=S.a[S.cur]===k?-1:k;sv();draw()}
+function go(i){if(i<0||i>=DATA[T].length)return;S.cur=i;if(mode==="exam")sv();draw()}
+function zoom(){dlg('<img src="'+img(T,S.cur)+'" style="width:100%;border-radius:10px;background:#fff"><div class="row"><button class="btn sec" onclick="closeDlg()">إغلاق</button></div>')}
+function pal(){
+  const A=DATA[T];let h='<h2>الأسئلة</h2><div class="pg">';
+  A.forEach((x,i)=>{
+    let c="c";
+    if(mode==="review")c+=S.a[i]===-1?" sk":S.a[i]===x?" ok":" no"; else if(S.a[i]!==-1)c+=" a";
+    if(i===S.cur)c+=" cur";
+    h+='<button class="'+c+'" onclick="closeDlg();go('+i+')">'+(i+1)+'</button>';
+  });
+  h+='</div>'+(mode==="exam"?'<button class="btn full" onclick="ask()">تسليم الاختبار</button>':'');
+  dlg(h);
+}
+function ask(){
+  const un=S.a.filter(x=>x===-1).length;
+  dlg('<h2>تسليم الاختبار؟</h2><p>'+(un?'لم تُجب عن '+un+' سؤال':'أجبت عن جميع الأسئلة')+'</p><div class="row"><button class="btn sec" onclick="closeDlg()">رجوع</button><button class="btn" onclick="closeDlg();finish()">تسليم</button></div>');
+}
+function leave(){dlg('<h2>العودة للرئيسية؟</h2><p>إجاباتك محفوظة والوقت مستمر، ويمكنك الرجوع لاحقاً.</p><div class="row"><button class="btn sec" onclick="closeDlg()">بقاء</button><button class="btn" onclick="closeDlg();home()">رجوع</button></div>')}
+function finish(){
+  clearInterval(tick); const A=DATA[T];
+  S.done=true; S.used=Math.min(DUR,Math.round((Date.now()-S.start)/1000));
+  S.score=S.a.reduce((n,a,i)=>n+(a===A[i]),0); sv(); result();
+}
+function result(){
+  clearInterval(tick); mode="result"; closeDlg(); const A=DATA[T], n=A.length;
+  const ok=S.score, sk=S.a.filter(x=>x===-1).length, bad=n-ok-sk, p=Math.round(ok/n*100);
+  $("app").innerHTML='<div class="wrap" style="text-align:center"><div class="head"><h1>نتيجة اختبار '+T+'</h1></div>'+
+   '<div class="score">'+p+'%</div><p style="color:var(--mut)">'+ok+' من '+n+' · الزمن '+fmt(S.used)+'</p>'+
+   '<div class="stats"><div style="background:var(--okb);color:var(--ok)"><b>'+ok+'</b>صحيحة</div><div style="background:var(--badb);color:var(--bad)"><b>'+bad+'</b>خاطئة</div><div style="background:var(--warnb);color:var(--warn)"><b>'+sk+'</b>بدون إجابة</div></div>'+
+   '<button class="btn full" onclick="review()">مراجعة الإجابات</button><div class="row"><button class="btn sec" onclick="retry()">إعادة الاختبار</button><button class="btn sec" onclick="home()">الرئيسية</button></div></div>';
+  window.scrollTo(0,0);
+}
+function review(){mode="review";S.cur=0;draw()}
+function retry(){dlg('<h2>إعادة الاختبار؟</h2><p>ستُمسح النتيجة الحالية ويبدأ المؤقت من جديد.</p><div class="row"><button class="btn sec" onclick="closeDlg()">إلغاء</button><button class="btn" onclick="begin()">ابدأ</button></div>')}
+document.addEventListener("keydown",e=>{
+  if(!S||$("ov").style.display!=="none"||$("app").querySelector(".opts")===null)return;
+  if(e.key==="ArrowLeft")go(S.cur+1);else if(e.key==="ArrowRight")go(S.cur-1);
+  else if(mode==="exam"&&/^[1-4]$/.test(e.key))pick(+e.key-1);
+});
+home();
+</script>
+</body>
+</html>
